@@ -41,11 +41,11 @@ async function processRange(jsonData, start, end) {
 
   for (let i = start - 1; i < end && i < jsonData.length; i++) {
     const entry = jsonData[i];
-    const outputFile = path.join(audioDir, `jeonser-${entry.kanji}.mp3`);
+    const outputFile = path.join(audioDir, `jeons-${entry.kanji}.mp3`);
     if (!audioFileExists(outputFile)) {
       await synthesizeSpeech(entry.kanji, outputFile);
       // Sleep for 1 second to avoid exceeding quota
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       console.log(`Skipping existing file: ${outputFile}`);
     }
@@ -62,6 +62,6 @@ fs.readFile(jsonFilePath, 'utf8', async (err, data) => {
 
     const jsonData = JSON.parse(data);
     const startRange = 1; // Set your start range here
-    const endRange = 600; // Set your end range here
+    const endRange = 1000; // Set your end range here
     await processRange(jsonData, startRange, endRange);
 });
