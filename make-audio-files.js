@@ -27,6 +27,11 @@ async function synthesizeSpeech(text, outputFile) {
   console.log(`Audio content written to file: ${outputFile}`);
 }
 
+// Function to check if an audio file exists
+function audioFileExists(filePath) {
+  return fs.existsSync(filePath);
+}
+
 // Function to process range and synthesize speech for each entry
 async function processRange(jsonData, start, end) {
   const audioDir = path.join(__dirname, 'audio');
@@ -36,8 +41,14 @@ async function processRange(jsonData, start, end) {
 
   for (let i = start - 1; i < end && i < jsonData.length; i++) {
     const entry = jsonData[i];
-    const outputFile = path.join(audioDir, `${entry.kanji}.mp3`);
-    await synthesizeSpeech(entry.kanji, outputFile);
+    const outputFile = path.join(audioDir, `jeonser-${entry.kanji}.mp3`);
+    if (!audioFileExists(outputFile)) {
+      await synthesizeSpeech(entry.kanji, outputFile);
+      // Sleep for 1 second to avoid exceeding quota
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } else {
+      console.log(`Skipping existing file: ${outputFile}`);
+    }
   }
 }
 
@@ -51,6 +62,6 @@ fs.readFile(jsonFilePath, 'utf8', async (err, data) => {
 
     const jsonData = JSON.parse(data);
     const startRange = 1; // Set your start range here
-    const endRange = 20; // Set your end range here
+    const endRange = 600; // Set your end range here
     await processRange(jsonData, startRange, endRange);
 });

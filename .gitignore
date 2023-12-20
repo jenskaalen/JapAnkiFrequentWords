@@ -1,6 +1,7 @@
 google_creds/
 audio/
 output*
+*.mp3
 
 # Logs
 logs

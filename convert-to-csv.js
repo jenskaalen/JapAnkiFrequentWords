@@ -3,19 +3,25 @@ const path = require('path');
 
 // Replace with the path to your JSON file
 const jsonFilePath = path.join(__dirname, 'output.json');
+const audioFolderPath = path.join(__dirname, 'audio');
+const audioFilePrefix = 'jeons-';
+
+// Function to check if an audio file exists with the prefix
+function audioFileExists(kanji) {
+    const audioFilePath = path.join(audioFolderPath, `${audioFilePrefix}${kanji}.mp3`);
+    return fs.existsSync(audioFilePath);
+}
 
 // Function to convert JSON to CSV
 function jsonToCSV(jsonData) {
-    // Create the CSV header
-    const header = 'Kanji,Romaji,English\n';
-
     // Map JSON data to CSV lines
-    const csvLines = jsonData.map(entry =>
-        `${entry.kanji},${entry.romaji},"${entry.english.replace(/"/g, '""')}"` // Handle quotes in English descriptions
-    );
+    const csvLines = jsonData.map(entry => {
+        const soundColumn = audioFileExists(entry.kanji) ? `[sound:${audioFilePrefix}${entry.kanji}.mp3]` : '';
+        return `${entry.kanji},${entry.romaji},"${entry.english.replace(/"/g, '""')}","${soundColumn}"`;
+    });
 
-    // Combine header and lines
-    return header + csvLines.join('\n');
+    // Combine lines
+    return csvLines.join('\n');
 }
 
 // Reading the JSON file and converting to CSV
